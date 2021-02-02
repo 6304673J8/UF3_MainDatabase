@@ -13,4 +13,15 @@ echo "ABFP $IP_CLIENT" | nc -q 1 $IP_SERVER $PORT
 
 echo "(3) Listening $PORT"
 
-nc -l -p $PORT
+RESPONSE=`nc -l -p $PORT`
+if [ "$RESPONSE" != "OK_CONN" ]; then
+	echo "Server offline"
+	exit 1
+fi
+
+echo "(6) HANDSHAKE"
+
+sleep 1
+echo "THIS_IS_MY_CLASSROOM" | nc -q 1 $IP_SERVER $PORT
+
+exit 0
