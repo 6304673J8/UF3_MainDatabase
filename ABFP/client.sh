@@ -22,6 +22,15 @@ fi
 echo "(6) HANDSHAKE"
 
 sleep 1
+
 echo "THIS_IS_MY_CLASSROOM" | nc -q 1 $IP_SERVER $PORT
 
+echo "(7) Listening..."
+
+HANDSHAKE=`nc -l -p $PORT`
+
+if [ "$HANDSHAKE" != "YES_IT_IS" ]; then
+	echo "Handshake Failed"
+	exit 1
+fi
 exit 0
