@@ -4,7 +4,7 @@ PORT=2021
 
 echo "(0) SERVER ABFP"
 
-echo "(1) Listening $PORT"
+echo "(1) Listening ($PORT) HEADERS"
 
 HEADER=`nc -l -p $PORT`
 
@@ -45,9 +45,35 @@ fi
 sleep 1
 echo "YES_IT_IS" | nc -q 1 $IP_CLIENT $PORT
 
-echo "(9) Listening: "
+echo "(9) Listening FILE_NAME... "
 
-ID_CLIENT=`nc -l -p $PORT`
+FILE_NAME=`nc -l -p $PORT`
 
-echo "CLIENT TESTING $ID_CLIENT"
+PREFIX=`echo $FILE_NAME | cut -d " " -f 1`
+NAME=`echo $FILE_NAME | cut -d " " -f 2`
+
+echo "TESTING CLIENT FILE"
+
+if [ "$PREFIX" != "FILE_NAME" ]; then
+	echo "ERROR in FILE_NAME"
+	
+	sleep 1
+	echo "KO_FILE_NAME" | nc -q l $IP_CLIENT $PORT
+	
+	exit 3
+fi
+
+echo "(12) FILE_NAME($NAME) RESPONSE..."
+
+sleep 1
+echo "OK_FILE_NAME" | nc -q l $IP_CLIENT $PORT
+
+echo "(13) Listening DATA..."
+
+DATA=`nc -l -p $PORT`
+
+echo "###FILE_MD5=`md5sum input_file.vaca`####"
+nc -l -p $PORT > input_file.vaca
+echo "###md5sum####"
+
 exit 0
