@@ -1,6 +1,7 @@
 #!/bin/bash
 
 PORT=2021
+FILE="input_file.vaca"
 
 echo "(0) SERVER ABFP"
 
@@ -71,9 +72,22 @@ echo "OK_FILE_NAME" | nc -q l $IP_CLIENT $PORT
 echo "(13) Listening DATA..."
 
 DATA=`nc -l -p $PORT`
+DATA_NAME=`echo $DATA | cut -d " " -f 2`
+DATA_MD5=`echo $DATA | cut -d " " -f 3`
+MD5_CHECK=`md5sum $FILE | cut -d " " -f 1`
 
-echo "###FILE_MD5=`md5sum input_file.vaca`####"
-nc -l -p $PORT > input_file.vaca
-echo "###md5sum####"
+if [ "$MD5_CHECK" != "$DATA_MD5" ]; then
+	sleep 1
+	echo "Server MD5 : $MD5_CHECK"
+	echo "Client MD5 : $DATA_MD5"
+	sleep 1
+	echo "DATA STATUS: CORRUPTED"
+	echo "KO_DATA" | nc -q l $IP_CLIENT $PORT
+	exit 4
+fi
+sleep 1
+echo "(16) FILE_STATUS RESPONSE..."
+
+echo "OK_DATA" | nc -q l $IP_CLIENT $PORT
 
 exit 0

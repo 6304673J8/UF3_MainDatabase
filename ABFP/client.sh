@@ -5,7 +5,7 @@ PORT=2021
 IP_CLIENT="127.0.0.1"
 IP_SERVER="127.0.0.1"
 
-FILE_NAME="output_file.vaca"
+FILE_NAME="input_file.vaca"
 
 echo "Cliente de ABFP"
 
@@ -39,6 +39,7 @@ fi
 echo "(10) Sending FILE_NAME"
 
 sleep 1
+
 echo "FILE_NAME $FILE_NAME" | nc -q l $IP_SERVER $PORT
 
 echo "(11) Listening FILE_NAME RESPONSE"
@@ -54,7 +55,22 @@ fi
 
 echo "(14) SENDING DATA"
 
+DATA_NAME="input_file.vaca"
+MD5_NAME=`md5sum $DATA_NAME`
+
 sleep 1
-echo $FILE_NAME | nc -q l $IP_SERVER $PORT
+
+echo "FILE_DATA $DATA_NAME $MD5_NAME" | nc -q l $IP_SERVER $PORT
+
+echo "(15) Listening..."
+sleep 1
+DATA_RESPONSE=`nc -l -p $PORT`
+
+echo "TEST OK_DATA RESPONSE"
+
+if [ "$DATA_RESPONSE" != "OK_DATA" ]; then
+	echo "ERROR: KO_DATA"
+	exit 4
+fi
 
 exit 0
