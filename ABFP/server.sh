@@ -72,9 +72,10 @@ echo "OK_FILE_NAME" | nc -q l $IP_CLIENT $PORT
 echo "(13) Listening DATA..."
 
 DATA=`nc -l -p $PORT`
+MD5_CHECK=`md5sum $FILE | cut -d " " -f 1`
 DATA_NAME=`echo $DATA | cut -d " " -f 2`
 DATA_MD5=`echo $DATA | cut -d " " -f 3`
-MD5_CHECK=`md5sum $FILE | cut -d " " -f 1`
+
 
 if [ "$MD5_CHECK" != "$DATA_MD5" ]; then
 	sleep 1
@@ -83,11 +84,14 @@ if [ "$MD5_CHECK" != "$DATA_MD5" ]; then
 	sleep 1
 	echo "DATA STATUS: CORRUPTED"
 	echo "KO_DATA" | nc -q l $IP_CLIENT $PORT
+	echo "Connection Status: Failed" | mail -s "ABFP-Admin" alejandro_test@mailinator.com
 	exit 4
 fi
 sleep 1
 echo "(16) FILE_STATUS RESPONSE..."
 
 echo "OK_DATA" | nc -q l $IP_CLIENT $PORT
+
+echo "File Status: OK ! ¹Server> $MD5_CHECK / ²Server> $DATA_MD5" | mail -s 'ABFP-Admin' alejandro_test@mailinator.com
 
 exit 0
