@@ -46,28 +46,65 @@ fi
 sleep 1
 echo "YES_IT_IS" | nc -q 1 $IP_CLIENT $PORT
 
-echo "(9) Listening FILE_NAME... "
+#LEER NUM ARCHIVOS A RECIBIR
 
-FILE_NAME=`nc -l -p $PORT`
+echo "(8b) LISTEN NUM_FILES"
 
-PREFIX=`echo $FILE_NAME | cut -d " " -f 1`
-NAME=`echo $FILE_NAME | cut -d " " -f 2`
+NUM_FILES=`nc -l -p $PORT`
 
-echo "TESTING CLIENT FILE"
+PREFIX=`echo $NUM_FILES | cut -d " " -f 1`
+NUM=`echo $NUM_FILES | cut -d " " -f 2`
 
-if [ "$PREFIX" != "FILE_NAME" ]; then
-	echo "ERROR in FILE_NAME"
-	
+if [ "$PREFIX" != "NUM_FILES" ]; then
+	echo "Error: Prefijo NUM_FILES incorrecto"
 	sleep 1
-	echo "KO_FILE_NAME" | nc -q l $IP_CLIENT $PORT
+	echo "K0_NUM_FILES" | nc -q 1 $IP_CLIENT $PORT
 	
-	exit 3
+	exit 2
 fi
 
-echo "(12) FILE_NAME($NAME) RESPONSE..."
-
 sleep 1
-echo "OK_FILE_NAME" | nc -q l $IP_CLIENT $PORT
+echo "OK_NUM_FILES" | nc -q 1 $IP_CLIENT $PORT
+echo "NUM_FILES: $NUM"
+#BUCLE
+
+for NUMBER in `seq $NUM`; do
+
+	echo "(9) Listening FILE_NAME... "
+
+	FILE_NAME=`nc -l -p $PORT`
+
+	PREFIX=`echo $FILE_NAME | cut -d " " -f 1`
+	NAME=`echo $FILE_NAME | cut -d " " -f 2`
+	NAME_MD5=`echo $FILE_NAME | cut -d " " -f 3`
+	
+	if [ "$PREFIX" != "FILE_NAME" ]; then
+		echo "ERROR in FILE_NAME"
+	
+		sleep 1
+		echo "KO_FILE_NAME" | nc -q l $IP_CLIENT $PORT
+	
+		exit 3
+	fi
+
+	TEMP_MD5=`echo $NAME | cut -d " " -f 4`
+
+	if [ "$NAME_MD5" != "$TEMP_MD5" ]; then
+		echo "ERROR in FILE_NAME"
+	
+		sleep 1
+		echo "KO_FILE_NAME" | nc -q l $IP_CLIENT $PORT
+	
+		exit 4
+	fi
+
+	echo "(12) FILE_NAME($NAME) RESPONSE..."
+	sleep 1
+	echo "OK_FILE_NAME" | nc -q l $IP_CLIENT $PORT
+	echo $OUTPUT_PATH$NAME
+
+	nc -l -p $PORT > $OUTPUT_PATH$NAME
+done
 
 echo "(13) Listening DATA..."
 
