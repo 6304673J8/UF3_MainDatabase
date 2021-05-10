@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PORT=2021
-FILE="input_file.vaca"
+OUTPUT_PATH="server_output/"
 
 echo "(0) SERVER ABFP"
 
@@ -56,7 +56,7 @@ PREFIX=`echo $NUM_FILES | cut -d " " -f 1`
 NUM=`echo $NUM_FILES | cut -d " " -f 2`
 
 if [ "$PREFIX" != "NUM_FILES" ]; then
-	echo "Error: Prefijo NUM_FILES incorrecto"
+	echo "Error: NUM_FILES incorrect output"
 	sleep 1
 	echo "K0_NUM_FILES" | nc -q 1 $IP_CLIENT $PORT
 	
@@ -87,7 +87,7 @@ for NUMBER in `seq $NUM`; do
 		exit 3
 	fi
 
-	TEMP_MD5=`echo $NAME | cut -d " " -f 4`
+	TEMP_MD5=`echo $NAME | md5sum |cut -d " " -f 1`
 
 	if [ "$NAME_MD5" != "$TEMP_MD5" ]; then
 		echo "ERROR in FILE_NAME"
